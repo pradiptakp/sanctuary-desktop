@@ -11,6 +11,21 @@ import { getDevices } from '../redux/actions/deviceActions';
 import Swal from 'sweetalert2';
 import Button from '../components/Button';
 import Input from '../components/Input';
+//@ts-ignore
+import arduinoCli from 'arduino-cli';
+import path from 'path';
+import fs from 'fs';
+const cliPath = path.join(
+  path.dirname(__dirname),
+  'extraResources',
+  'arduino-cli.exe'
+);
+const cli = arduinoCli(cliPath, {
+  directories: {
+    user: '~/arduino-cli/sketches',
+    data: '~/arduino-cli/data',
+  },
+});
 
 const generateSketch = ({
   devices,
@@ -200,6 +215,9 @@ const Setup = () => {
   }, []);
 
   const onSelect = async (device: Device) => {
+    cli.version().then((res: any) => {
+      alert(res);
+    });
     if (selectedDevices.find((v) => v.device.id === device.id)) {
       setSelectedDevices(
         selectedDevices.filter((v) => v.device.id !== device.id)
@@ -229,7 +247,31 @@ const Setup = () => {
         </div>
       ) : (
         <Card className="bg-white ">
-          <div className="flex space-x-4">
+          <div className="mx-4 p-4">
+            <div className="flex items-center">
+              <div className="flex items-center text-blue-600 relative">
+                <div className="rounded-full transition duration-500 ease-in-out h-4 w-4  border-2 border-blue-600"></div>
+                <div className="absolute top-0 -ml-14 text-center mt-6 w-32 text-xs font-medium uppercase text-blue-600">
+                  Sketch Setup
+                </div>
+              </div>
+              <div className="flex-auto border-t-2 transition duration-500 ease-in-out border-blue-600"></div>
+              <div className="flex items-center text-white relative">
+                <div className="rounded-full transition duration-500 ease-in-out h-4 w-4  border-2 bg-blue-600 border-blue-600"></div>
+                <div className="absolute top-0 -ml-14 text-center mt-6 w-32 text-xs font-medium uppercase text-blue-600">
+                  Arduino Setup
+                </div>
+              </div>
+              <div className="flex-auto border-t-2 transition duration-500 ease-in-out border-gray-300"></div>
+              <div className="flex items-center text-gray-500 relative">
+                <div className="rounded-full transition duration-500 ease-in-out h-4 w-4 border-2 border-gray-300"></div>
+                <div className="absolute top-0 -ml-14 text-center mt-6 w-32 text-xs font-medium uppercase text-gray-500">
+                  Compile
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex space-x-4 mt-16">
             <div>
               WIFI Name / SSID
               <Input
@@ -250,12 +292,27 @@ const Setup = () => {
             </div>
             <div className="flex-1" />
             <Button
+              onClick={() => {
+                fs.writeFile(
+                  path.dirname(__dirname) + '/~/arduino-cli/sketches/test.ino',
+                  generateSketch({
+                    devices: selectedDevices,
+                    host: hostname,
+                    pass: pass,
+                    ssid: ssid,
+                  }),
+                  function (err) {
+                    if (err) return console.log(err);
+                    console.log('Hello World > helloworld.txt');
+                  }
+                );
+              }}
               className="ml-6"
               disabled={
                 loading || !pass || !ssid || selectedDevices.length === 0
               }
             >
-              Compile
+              Next
             </Button>
           </div>
           <div className="w-full h-px bg-blueGray-200 my-4" />

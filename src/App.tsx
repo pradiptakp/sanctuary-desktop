@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
+import { HashRouter, Switch, Route, Redirect } from 'react-router-dom';
 import './App.global.css';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -13,6 +13,7 @@ import { Provider as ReduxProvider, useSelector } from 'react-redux';
 import { Layout } from './containers/Layout';
 import Login from './pages/Login';
 import Home from './pages/Home';
+import Setup from './pages/Setup';
 import { RootState, store } from './redux/store';
 
 const contextClass = {
@@ -34,6 +35,7 @@ const Navigations = () => {
           <Layout>
             <Switch>
               <Route path="/dashboard" exact component={Home} />
+              <Route path="/setup" exact component={Setup} />
 
               <Redirect to="/dashboard" />
             </Switch>
@@ -53,7 +55,7 @@ const Navigations = () => {
 export default function App() {
   return (
     <ReduxProvider store={store}>
-      <BrowserRouter>
+      <HashRouter>
         <Navigations />
         <ToastContainer
           transition={Slide}
@@ -65,7 +67,7 @@ export default function App() {
             ' relative flex p-4 my-4 min-h-10 rounded-md justify-between overflow-hidden cursor-pointer'
           }
         />
-      </BrowserRouter>
+      </HashRouter>
     </ReduxProvider>
   );
 }

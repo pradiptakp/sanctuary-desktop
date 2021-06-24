@@ -5,7 +5,7 @@ import { RootState } from '../redux/store';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { toggleDarkMode } from '../redux/actions/appActions';
 import { PayloadAction } from 'typesafe-actions';
-import { useLocation } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { toTitleCase } from '../utils/formatter';
 import { postLogout } from '../redux/actions/authActions';
 
@@ -18,6 +18,7 @@ export const Navbar = ({
 }) => {
   const user = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
+  const history = useHistory();
   const { pathname } = useLocation();
 
   const onLogout = () => {
@@ -100,37 +101,17 @@ export const Navbar = ({
         </nav>
       </header>
       <div className="mb-6">
-        <div className="mb-2 text-gray-400 font-medium">
-          Sanctuary
-          {pathname.split('/').map((v, i) => {
-            if (i === 0) return null;
-            return (
-              <span>
-                <span className="mx-2">\</span>
-                <span
-                  className={`${
-                    (pathname
-                      .split('/')
-                      [pathname.split('/').length - 2].includes('edit') &&
-                      i === pathname.split('/').length - 2) ||
-                    i === pathname.split('/').length - 1
-                      ? 'text-blue-500 font-bold'
-                      : ''
-                  }`}
-                >
-                  {v
-                    .split('-')
-                    .map(
-                      (_v, i) =>
-                        `${i !== 0 ? ' ' : ''}${_v
-                          .charAt(0)
-                          .toUpperCase()}${_v.substr(1)}`
-                    )}
-                </span>
-              </span>
-            );
-          })}
-        </div>
+        {pathname !== '/dashboard' ? (
+          <div
+            onClick={() => history.goBack()}
+            className="mb-2 text-blue-600 hover:text-blue-700 transition font-medium cursor-pointer"
+          >
+            ← Back
+          </div>
+        ) : (
+          <div className="mb-2 text-gray-600 ">Sanctuary Desktop App</div>
+        )}
+
         <div className="text-2xl font-bold tracking-wide">
           {toTitleCase(
             pathname.split('/')[pathname.split('/').length - 2].includes('edit')

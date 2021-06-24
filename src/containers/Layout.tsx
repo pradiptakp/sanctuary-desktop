@@ -1,8 +1,8 @@
-import React from "react";
-import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
-import { RootState } from "../redux/store";
-import { useSelector } from "react-redux";
+import React from 'react';
+import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
+import { RootState } from '../redux/store';
+import { useSelector } from 'react-redux';
 
 export const Layout: React.FC<{}> = ({ children }) => {
   const dark = useSelector((state: RootState) => state.app.dark);
@@ -10,10 +10,10 @@ export const Layout: React.FC<{}> = ({ children }) => {
   return (
     <div
       className={`${
-        dark ? "dark" : ""
+        dark ? 'dark' : ''
       } flex h-screen overflow-y-hidden bg-blueGray-100`}
     >
-      <Sidebar />
+      {/* <Sidebar /> */}
       <div className="flex-1 relative flex flex-col w-full overflow-y-scroll scrollbar-thin p-6">
         <div>
           <Navbar />

@@ -9,6 +9,8 @@ import ClipLoader from 'react-spinners/ClipLoader';
 import { Link } from 'react-router-dom';
 import { getDevices } from '../redux/actions/deviceActions';
 import Swal from 'sweetalert2';
+import Button from '../components/Button';
+import Input from '../components/Input';
 
 const generateSketch = ({
   devices,
@@ -119,21 +121,19 @@ void loop()
           Serial.print("Error code: ");
           Serial.println(httpResponseCode);
         }
-      // Free resources
+
       http${i}.end();
       }
       `
           : `
-      // DEVICE 1
+
       HTTPClient http${i};
 
       String url${i} = ${host} + "/api/device-from-mc/" + ${v.device.id} + "?options=keyValues";
 
-      // Your Domain name with URL path or IP address with path
       http${i}.begin(url${i}.c_str());
       http${i}.addHeader("fiware-service", "openiot");
       http${i}.addHeader("fiware-servicepath", "/");
-      // Send HTTP GET request
       int httpResponseCode = http${i}.GET();
 
       if (httpResponseCode>0) {
@@ -155,7 +155,7 @@ void loop()
         Serial.print("Error code: ");
         Serial.println(httpResponseCode);
       }
-      // Free resources
+
       http${i}.end();
       `
       }
@@ -175,9 +175,12 @@ void loop()
 const Setup = () => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
+  const hostname = useSelector((state: RootState) => state.app.hostUrl);
 
   const [loading, setLoading] = React.useState(true);
   const [devices, setDevices] = React.useState<Device[]>([]);
+  const [ssid, setSsid] = React.useState('');
+  const [pass, setPass] = React.useState('');
   const [selectedDevices, setSelectedDevices] = React.useState<
     { device: Device; pin: string }[]
   >([]);
@@ -225,46 +228,78 @@ const Setup = () => {
           <ClipLoader size={40} color={'#123abc'} />
         </div>
       ) : (
-        <Card className="bg-white flex items-start space-x-10">
-          <div className=" flex flex-col justify-center w-64">
-            <div className="font-bold mb-4">
-              Devices{' '}
-              <span className="font-normal text-blueGray-400">
-                (Click to select)
-              </span>
+        <Card className="bg-white ">
+          <div className="flex space-x-4">
+            <div>
+              WIFI Name / SSID
+              <Input
+                type="text"
+                placeholder="WIFI Name"
+                value={ssid}
+                onChange={(e) => setSsid(e.target.value)}
+              />
             </div>
-            {devices.map((v) => {
-              return (
-                <div
-                  onClick={() => onSelect(v)}
-                  className={`p-4 mb-4 rounded-md hover:bg-blue-100 transition cursor-pointer ${
-                    selectedDevices.find((_v) => _v.device.id === v.id)
-                      ? 'bg-blue-100 ring-2 ring-blue-600'
-                      : 'bg-blueGray-100'
-                  }`}
-                >
-                  <div className="text-xs font-medium text-blueGray-400 ">
-                    Device{' '}
-                  </div>
-                  <div>{v.id.replace('urn:ngsi-ld:', '')}</div>
-                  <div className="text-xs font-medium text-blueGray-400 mt-2">
-                    Room
-                  </div>
-                  <div>{v.refRoom}</div>
-                </div>
-              );
-            })}
+            <div>
+              WIFI Password
+              <Input
+                type="text"
+                placeholder="WIFI Password"
+                value={pass}
+                onChange={(e) => setPass(e.target.value)}
+              />
+            </div>
+            <div className="flex-1" />
+            <Button
+              className="ml-6"
+              disabled={
+                loading || !pass || !ssid || selectedDevices.length === 0
+              }
+            >
+              Compile
+            </Button>
           </div>
-          <div className="flex-1">
-            <div className="font-bold mb-4">Sketch Output</div>
-            <pre className="text-xs bg-blueGray-100 p-4 rounded-md">
-              {generateSketch({
-                devices: selectedDevices,
-                host: 'http://192.16.1.5:3002',
-                pass: 'IndihomeTai123',
-                ssid: 'TEST',
+          <div className="w-full h-px bg-blueGray-200 my-4" />
+          <div className="flex items-start space-x-10">
+            <div className=" flex flex-col justify-center w-64">
+              <div className="font-bold mb-4">
+                Devices{' '}
+                <span className="font-normal text-blueGray-400">
+                  (Click to select)
+                </span>
+              </div>
+              {devices.map((v) => {
+                return (
+                  <div
+                    onClick={() => onSelect(v)}
+                    className={`p-4 mb-4 rounded-md hover:bg-blue-100 transition cursor-pointer ${
+                      selectedDevices.find((_v) => _v.device.id === v.id)
+                        ? 'bg-blue-100 ring-2 ring-blue-600'
+                        : 'bg-blueGray-100'
+                    }`}
+                  >
+                    <div className="text-xs font-medium text-blueGray-400 ">
+                      Device{' '}
+                    </div>
+                    <div>{v.id.replace('urn:ngsi-ld:', '')}</div>
+                    <div className="text-xs font-medium text-blueGray-400 mt-2">
+                      Room
+                    </div>
+                    <div>{v.refRoom}</div>
+                  </div>
+                );
               })}
-            </pre>
+            </div>
+            <div className="flex-1">
+              <div className="font-bold mb-4">Sketch Preview</div>
+              <pre className="text-xs bg-blueGray-100 p-4 rounded-md">
+                {generateSketch({
+                  devices: selectedDevices,
+                  host: hostname,
+                  pass: pass,
+                  ssid: ssid,
+                })}
+              </pre>
+            </div>
           </div>
         </Card>
       )}

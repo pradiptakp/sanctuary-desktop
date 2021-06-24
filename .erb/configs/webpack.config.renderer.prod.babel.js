@@ -16,9 +16,12 @@ import DeleteSourceMaps from '../scripts/DeleteSourceMaps';
 CheckNodeEnv('production');
 DeleteSourceMaps();
 
-const devtoolsConfig = process.env.DEBUG_PROD === 'true' ? {
-  devtool: 'source-map'
-} : {};
+const devtoolsConfig =
+  process.env.DEBUG_PROD === 'true'
+    ? {
+        devtool: 'source-map',
+      }
+    : {};
 
 export default merge(baseConfig, {
   ...devtoolsConfig,
@@ -52,7 +55,15 @@ export default merge(baseConfig, {
             },
           },
           'css-loader',
-          'sass-loader'
+          'sass-loader',
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [require('tailwindcss'), require('autoprefixer')],
+              },
+            },
+          },
         ],
       },
       // WOFF Font
@@ -125,13 +136,12 @@ export default merge(baseConfig, {
 
   optimization: {
     minimize: true,
-    minimizer:
-      [
-        new TerserPlugin({
-          parallel: true,
-        }),
-        new CssMinimizerPlugin(),
-      ],
+    minimizer: [
+      new TerserPlugin({
+        parallel: true,
+      }),
+      new CssMinimizerPlugin(),
+    ],
   },
 
   plugins: [

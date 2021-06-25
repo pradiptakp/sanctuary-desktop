@@ -171,9 +171,9 @@ void loop()
         const char* onState = "on";
 
         if(strcmp(state, offState) == 0) {
-          digitalWrite(${v.pin}, HIGH);
+          digitalWrite(PIN_${v.pin}, HIGH);
         } else if (strcmp(state, onState) == 0) {
-          digitalWrite(${v.pin}, LOW);
+          digitalWrite(PIN_${v.pin}, LOW);
         }
       }
       else {

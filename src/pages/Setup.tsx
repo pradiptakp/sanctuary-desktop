@@ -154,7 +154,7 @@ void loop()
 
       HTTPClient http${i};
 
-      String url${i} = host + "/api/device-from-mc/" + "${v.device.id}" + "?options=keyValues";
+      String url${i} = host + "/api/device-from-mc/" + "${v.device.id}";
 
       http${i}.begin(url${i}.c_str());
       http${i}.addHeader("fiware-service", "openiot");

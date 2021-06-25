@@ -3,7 +3,6 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Card } from '../components/Card';
 import { RootState } from '../redux/store';
-import { getDashboardInfo } from '../redux/actions/appActions';
 import { DashboardData, Device } from '../types';
 import ClipLoader from 'react-spinners/ClipLoader';
 import { Link, useHistory } from 'react-router-dom';
@@ -16,6 +15,12 @@ import arduinoCli from 'arduino-cli';
 import path from 'path';
 import fs from 'fs';
 
+const appDataPath =
+  (process.env.APPDATA ||
+    (process.platform == 'darwin'
+      ? process.env.HOME + '/Library/Preferences'
+      : process.env.HOME + '/.local/share')) +
+  '/Sanctuary Desktop/~/arduino-cli';
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
@@ -24,12 +29,11 @@ const cliPath = path.join(
   'extraResources',
   'arduino-cli.exe'
 );
-const sketchesPath = path.dirname(__dirname) + '/~/arduino-cli/sketches/';
 
 const cli = arduinoCli(cliPath, {
   directories: {
-    user: '~/arduino-cli/sketches',
-    data: '~/arduino-cli/data',
+    user: appDataPath + '/sketches',
+    data: appDataPath + '/data',
   },
 });
 
@@ -218,6 +222,15 @@ const Setup = () => {
   const [port, setPort] = React.useState('');
   const [compileOutput, setCompileOutput] = React.useState<string>('');
 
+  const callback = React.useCallback(
+    (res) => {
+      console.log(compileOutput);
+      console.log(res);
+      setCompileOutput(compileOutput + '\n' + res);
+    },
+    [compileOutput]
+  );
+
   React.useEffect(() => {
     cli.listConnectedBoards().then((res: any) => console.log(res));
     dispatch(
@@ -252,7 +265,7 @@ const Setup = () => {
           setIsInstallingBoard(false);
           installLibraries().then(() => {
             fs.writeFile(
-              path.dirname(__dirname) + `/~/arduino-cli/sketches/sketches.ino`,
+              appDataPath + `/sketches/sketches.ino`,
               generateSketch({
                 devices: selectedDevices,
                 host: hostname,
@@ -260,43 +273,26 @@ const Setup = () => {
                 ssid: ssid,
               }),
               function (err) {
-                if (err) return console.log(err);
+                if (err) return alert(appDataPath + `/sketches/sketches.ino`);
               }
             );
           });
         });
     }
     if (step === 3) {
-      cli
-        .compile(
-          (res: string) => {
-            console.log(res);
-            setCompileOutput(compileOutput + '\n' + res);
-          },
-          'esp8266:esp8266:nodemcu',
-          'sketches'
-        )
-        .then(() => {
-          cli
-            .upload(
-              (res: string) => {
-                console.log(res);
-                setCompileOutput(compileOutput + '\n' + res);
-              },
-              port,
-              'esp8266:esp8266:nodemcu',
-              'sketches'
-            )
-            .then(() => {
-              Swal.fire(
-                'Success',
-                'Sketch compiled and uploaded to the board',
-                'success'
-              ).then(() => {
-                history.replace('/dashboard');
-              });
+      cli.compile(callback, 'esp8266:esp8266:nodemcu', 'sketches').then(() => {
+        cli
+          .upload(callback, port, 'esp8266:esp8266:nodemcu', 'sketches')
+          .then(() => {
+            Swal.fire(
+              'Success',
+              'Sketch compiled and uploaded to the board',
+              'success'
+            ).then(() => {
+              history.replace('/dashboard');
             });
-        });
+          });
+      });
     }
   }, [step]);
 

@@ -17,12 +17,6 @@ int PIN_5 = 5;
 String ID_5 = "urn:ngsi-ld:Lamp:001";
 
 
-int PIN_4 = 4;
-String ID_4 = "urn:ngsi-ld:Temperature:001";
-
-DHT dht(PIN_4, DHTTYPE);
-
-
 float temp = 0.0;
 
 WiFiClient client;
@@ -34,7 +28,6 @@ void setup()
 
        
         pinMode(PIN_5, OUTPUT);
-        dht.begin();
        Serial.println("Connecting to ");
        Serial.println(ssid);
        WiFi.mode(WIFI_STA);
@@ -85,38 +78,6 @@ void loop()
       }
 
       http0.end();
-      
-      
-      
-      HTTPClient http1;
-      String url1 = host + "/api/device/update-temperature/" + "urn:ngsi-ld:Temperature:001";
-
-      float newTemp = dht.readTemperature();
-
-      if (isnan(newTemp)) {
-        Serial.println("Failed to read from DHT sensor!");
-      }
-
-      http1.begin(url1.c_str());
-      http1.addHeader("Content-Type", "text/plain");
-
-      if (temp != newTemp) {
-        temp = newTemp;
-        Serial.println(temp);
-
-        int httpResponseCode1 = http1.POST(String(newTemp, 1));
-
-        if (httpResponseCode1>0) {
-          Serial.print("HTTP Response code: ");
-          Serial.println(httpResponseCode1);
-        }
-        else {
-          Serial.print("Error code: ");
-          Serial.println(httpResponseCode1);
-        }
-
-      http1.end();
-      }
       
       
     }

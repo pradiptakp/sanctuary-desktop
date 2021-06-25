@@ -1,7 +1,7 @@
 {
   "name": "sanctuary-desktop",
   "productName": "Sanctuary Desktop",
-  "version": "2.3.0",
+  "version": "1.0.0",
   "description": "Sanctuary Smarthome desktop application for setting up devices",
   "main": "./main.prod.js",
   "author": {

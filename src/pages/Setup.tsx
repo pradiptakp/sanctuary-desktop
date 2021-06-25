@@ -221,15 +221,19 @@ const Setup = () => {
 
   const [port, setPort] = React.useState('');
   const [compileOutput, setCompileOutput] = React.useState<string>('');
+  const [compileOutputTemp, setCompileOutputTemp] = React.useState<string>('');
 
   const callback = React.useCallback(
     (res) => {
-      console.log(compileOutput);
       console.log(res);
-      setCompileOutput(compileOutput + '\n' + res);
+      setCompileOutputTemp('\n' + res);
     },
-    [compileOutput]
+    [compileOutputTemp]
   );
+
+  React.useEffect(() => {
+    setCompileOutput(compileOutput + compileOutputTemp);
+  }, [compileOutputTemp]);
 
   React.useEffect(() => {
     cli.listConnectedBoards().then((res: any) => console.log(res));
@@ -281,9 +285,11 @@ const Setup = () => {
     }
     if (step === 3) {
       cli.compile(callback, 'esp8266:esp8266:nodemcu', 'sketches').then(() => {
+        setIsCompiling(false);
         cli
           .upload(callback, port, 'esp8266:esp8266:nodemcu', 'sketches')
           .then(() => {
+            setIsUploading(false);
             Swal.fire(
               'Success',
               'Sketch compiled and uploaded to the board',

@@ -12,6 +12,7 @@ import { Provider as ReduxProvider, useSelector } from 'react-redux';
 
 import { Layout } from './containers/Layout';
 import Login from './pages/Login';
+import InputHost from './pages/InputHost';
 import Home from './pages/Home';
 import Setup from './pages/Setup';
 import { RootState, store } from './redux/store';
@@ -27,6 +28,7 @@ const contextClass = {
 
 const Navigations = () => {
   const { user } = useSelector((state: RootState) => state.auth);
+  const { hostUrl } = useSelector((state: RootState) => state.app);
 
   return (
     <Switch>
@@ -36,7 +38,7 @@ const Navigations = () => {
             <Switch>
               <Route path="/dashboard" exact component={Home} />
               <Route path="/setup" exact component={Setup} />
-
+              <Route path="/input-host" exact component={InputHost} />
               <Redirect to="/dashboard" />
             </Switch>
           </Layout>
@@ -44,8 +46,8 @@ const Navigations = () => {
       ) : (
         <>
           <Route path="/login" exact component={Login} />
-
-          <Redirect to="/login" />
+          <Route path="/input-host" exact component={InputHost} />
+          {hostUrl ? <Redirect to="/login" /> : <Redirect to="/input-host" />}
         </>
       )}
     </Switch>

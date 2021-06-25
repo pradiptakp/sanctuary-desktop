@@ -1,17 +1,19 @@
 import React from 'react';
 import Input from '../components/Input';
 import Button from '../components/Button';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { postLogin } from '../redux/actions/authActions';
 import nProgress from 'nprogress';
 import { toast } from 'react-toastify';
 import { useHistory } from 'react-router-dom';
+import { RootState } from '../redux/store';
 
 const Login = () => {
   const history = useHistory();
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [loading, setLoading] = React.useState(false);
+  const { hostUrl } = useSelector((state: RootState) => state.app);
 
   const dispatch = useDispatch();
 
@@ -39,7 +41,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center min-h-screen p-6 bg-gray-50 dark:bg-gray-900">
+    <div className="flex items-center min-h-screen p-6 bg-blueGray-100">
       <div className="flex-1 h-full max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-xl dark:bg-gray-800">
         <div className="flex flex-col overflow-y-auto md:flex-row">
           <main className="flex items-center justify-center p-6 sm:p-12 md:w-1/2">
@@ -79,6 +81,13 @@ const Login = () => {
               >
                 Log in
               </Button>
+              <div className="mt-6 text-xs">Hostname: {hostUrl}</div>
+              <div
+                className="text-blue-600 hover:text-blue-700 transition font-bold text-xs cursor-pointer"
+                onClick={() => history.push('/input-host')}
+              >
+                Change
+              </div>
             </form>
           </main>
           <div className="h-32 md:h-auto md:w-1/2 bg-purple-900 flex items-center justify-center">

@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 const Home = () => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
+  const { hostUrl } = useSelector((state: RootState) => state.app);
 
   const [loading, setLoading] = React.useState(true);
   const [data, setData] = React.useState<DashboardData>();
@@ -49,7 +50,18 @@ const Home = () => {
           <Link to="/setup">
             <Card className="flex items-center hover:bg-blueGray-50 transition">
               <div className="flex-1">
-                <div className="text-xl font-bold">Setup Device ➞</div>
+                <div className="text-xl font-bold">Setup Device</div>
+              </div>
+            </Card>
+          </Link>
+          <Link to="/input-host">
+            <Card className="flex items-center hover:bg-blueGray-50 transition">
+              <div className="flex-1">
+                <div className="text-xl font-bold">Change Hostname</div>
+                <div className="font-bold text-gray-600">
+                  Current Hostname :{' '}
+                  <span className="font-normal">{hostUrl}</span>
+                </div>
               </div>
             </Card>
           </Link>

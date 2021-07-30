@@ -23,7 +23,9 @@ const Save = () => {
     dispatch(setHostUrl(host));
     if (user) {
       history.replace('/dashboard');
+      nProgress.done();
     } else {
+      nProgress.done();
       history.replace('/login');
     }
   };
